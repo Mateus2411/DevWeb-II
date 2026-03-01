@@ -29,7 +29,7 @@ function manipular(acao) {
       </button>
     </div>
     <div id="incrementar">
-      <input type="number" min="0" v-model="valor" @input="valor = Math.abs(valor)" />
+      <input type="number" min="0" max="10" v-model="valor" @input="valor = Math.abs(valor); if(valor > 10) valor = 10" />
       {{ valor }}
     </div>
   </section>
@@ -51,12 +51,12 @@ function manipular(acao) {
   #escrita {
     font-size: 3rem;
     font-weight: 500;
-    color: white;
+    color: rgb(0, 0, 0);
   }
   #contador {
     font-size: 5rem;
     font-weight: 700;
-    color: white;
+    color: rgb(0, 0, 0);
   }
 }
 
