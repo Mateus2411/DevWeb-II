@@ -4,23 +4,12 @@ import FooterComp from '@/components/FooterComp.vue'
 </script>
 
 <template>
-  <div class="app-wrapper">
-    <HeaderComp />
-    <main class="main-content">
+  <HeaderComp />
+    <main>
       <router-view />
     </main>
-    <FooterComp />
-  </div>
+  <FooterComp />
 </template>
 
 <style scoped>
-.app-wrapper {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.main-content {
-  flex: 1;
-}
 </style>

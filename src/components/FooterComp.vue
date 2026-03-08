@@ -29,6 +29,7 @@ const githubUrl = 'https://github.com/Mateus2411'
 .footer {
   background: linear-gradient(135deg, #a29bfe 0%, #74b9ff 100%);
   padding: 2rem 0;
+  bottom: 0;
 }
 
 .container {

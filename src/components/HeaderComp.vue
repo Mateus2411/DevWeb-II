@@ -25,6 +25,7 @@ const closeDropdown = () => {
 
           <div v-if="showDropdown" class="dropdown-menu">
             <router-link to="/atividade-contador" class="dropdown-item" @click="closeDropdown">Contador</router-link>
+            <router-link to="/atividade-tarefas" class="dropdown-item" @click="closeDropdown">Gen.Tarefas</router-link>
           </div>
         </div>
       </nav>

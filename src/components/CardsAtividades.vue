@@ -7,10 +7,15 @@ const atividades = [
   {
     id: 1,
     titulo: 'Contador',
-    descricao: 'Aplicação simples de contador com Vue.js',
     foto: '/ImagensAtividades/contador.png',
     rota: '/atividade-contador',
   },
+  {
+    id: 2,
+    titulo: 'Gerenciador de Tarefas',
+    foto: '/ImagensAtividades/gen-tarefas.png',
+    rota: '/atividade-tarefas'
+  }
 ]
 
 const navegarPara = (rota) => {

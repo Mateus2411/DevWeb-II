@@ -13,6 +13,11 @@ const router = createRouter({
       name: 'NomeIdentificação',
       component: () => import('@/views/Atividades/AtividadeContador.vue'),
     },
+    {
+      path: '/atividade-tarefas',
+      name: 'Gerenciador De Tarefas',
+      component: () => import('@/views/Atividades/AtividadeGerenciadorTarefas.vue'),
+    },
   ],
 })
 

@@ -8,7 +8,6 @@ import CardsAtividades from '@/components/CardsAtividades.vue'
       <h1>Atividades DevWeb II</h1>
       <p>Repositório das atividades da disciplina</p>
     </div>
-
     <CardsAtividades />
   </section>
 </template>
