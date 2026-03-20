@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const tarefas = ref([
   { id: 1, nome: 'Configurar repositório Git', status: 'pendente' },
@@ -23,36 +23,78 @@ const tarefas = ref([
   { id: 19, nome: 'Corrigir bugs reportados', status: 'pendente' },
   { id: 20, nome: 'Publicar versão 1.0', status: 'pendente' },
 ])
-onMounted(() => {})
+
 const novaTarefa = ref('')
-
-const toggleStatus = (tarefa) => {
-  tarefa.status = tarefa.status === 'pendente' ? 'concluido' : 'pendente'
-}
-
-const removerTarefa = (id) => {
-  const index = tarefas.value.findIndex((t) => t.id === id)
-  if (index !== -1) {
-    tarefas.value.splice(index, 1)
-  }
-}
 const erro = ref(false)
-const adicionarTarefa = () => {
-  if (tarefas.value.some((t) => t.nome === novaTarefa.value.trim())) {
-    // alert('Tarefa já existe!')
-    erro.value = true
-    setTimeout(() => {
-      erro.value = false
-    }, 2000)
-    novaTarefa.value = ''
-  } else if (novaTarefa.value.trim()) {
-    const novoId = tarefas.value.length > 0 ? Math.max(...tarefas.value.map((t) => t.id)) + 1 : 1
-    tarefas.value.push({
-      id: novoId,
-      nome: novaTarefa.value,
-      status: 'pendente',
-    })
-    novaTarefa.value = ''
+const procurar = ref('')
+
+const editando = ref(false)
+const editName = ref('')
+const novoNome = ref('')
+const editId = ref(null)
+
+const tarefasFiltradas = computed(() => {
+  if (!procurar.value) return tarefas.value
+
+  return tarefas.value.filter((item) =>
+    item.nome.toLowerCase().includes(procurar.value.toLowerCase().trim()),
+  )
+})
+
+function manipular(acao, posicaoTarefa, tarefaNome) {
+  switch (acao) {
+    case 'adicionar': {
+      if (!tarefas.value.some((item) => item.nome === novaTarefa.value)) {
+        tarefas.value.push({
+          id: Math.max(...tarefas.value.map((item) => item.id)) + 1,
+          nome: novaTarefa.value,
+          status: 'pendente',
+        })
+        novaTarefa.value = ''
+      } else {
+        erro.value = true
+        setTimeout(() => {
+          erro.value = false
+        }, 1500)
+        novaTarefa.value = ''
+      }
+      break
+    }
+    case 'deletar': {
+      tarefas.value.splice(
+        tarefas.value.findIndex((item) => item.id === posicaoTarefa),
+        1,
+      )
+      break
+    }
+    case 'marcar': {
+      // Melhorar isso (obs: me sinto um macaco)
+      if (
+        tarefas.value[tarefas.value.findIndex((item) => item.id === posicaoTarefa)].status ===
+        'pendente'
+      )
+        tarefas.value[tarefas.value.findIndex((item) => item.id === posicaoTarefa)].status =
+          'concluido'
+      else
+        tarefas.value[tarefas.value.findIndex((item) => item.id === posicaoTarefa)].status =
+          'pendente'
+      break
+    }
+    case 'editar': {
+      tarefas.value[tarefas.value.findIndex((item) => item.id === posicaoTarefa)].nome = tarefaNome
+      break
+    }
+    case 'salvar': {
+      const index = tarefas.value.findIndex((item) => item.id === editId.value)
+      if (index !== -1 && novoNome.value.trim()) {
+        tarefas.value[index].nome = novoNome.value.trim()
+      }
+
+      editando.value = false
+      editId.value = null
+      novoNome.value = ''
+      break
+    }
   }
 }
 </script>
@@ -70,7 +112,7 @@ const adicionarTarefa = () => {
       <div class="adicionar-tarefa">
         <input
           v-model="novaTarefa"
-          @keyup.enter="adicionarTarefa"
+          @keyup.enter="manipular('adicionar')"
           :disabled="erro"
           type="text"
           placeholder="✏️ Digite uma nova tarefa..."
@@ -98,34 +140,82 @@ const adicionarTarefa = () => {
       </div>
 
       <div class="areaTarefas">
+        <div class="procurar">
+          <h2>Procurar</h2>
+          <input v-model="procurar" type="text" title="✏️ Procure por uma tarefa" />
+        </div>
         <div class="header-tarefas">
           <p>Nome</p>
           <p>Estado</p>
           <p>Ações</p>
         </div>
         <div class="tarefas">
-          <div v-for="tarefa in tarefas" :key="tarefa.id" class="tarefa">
-            <div class="nome">
-              <p>{{ tarefa.nome }}</p>
+          <div v-for="tarefa in !procurar ? tarefas : tarefasFiltradas" :key="tarefa.id">
+            <div v-if="tarefasFiltradas.length !== 0" class="tarefa">
+              <div class="nome">
+                <p>{{ tarefa.nome }}</p>
+              </div>
+              <div class="status">
+                <p :class="tarefa.status">
+                  {{ tarefa.status }}
+                </p>
+              </div>
+              <div class="acoes">
+                <button
+                  @click="manipular('marcar', tarefa.id)"
+                  class="btn-toggle"
+                  :title="
+                    tarefa.status === 'pendente' ? 'Marcar como concluída' : 'Marcar como pendente'
+                  "
+                >
+                  {{ tarefa.status === 'pendente' ? '✓' : '↻' }}
+                </button>
+                <button
+                  @click="manipular('deletar', tarefa.id)"
+                  class="btn-remover"
+                  title="Remover tarefa"
+                >
+                  🗑️
+                </button>
+                <button
+                  @click="
+                    ((editando = true),
+                    (editName = tarefa.nome),
+                    (novoNome = tarefa.nome),
+                    (editId = tarefa.id))
+                  "
+                >
+                  ✏️
+                </button>
+                <div v-if="editando" class="editar">
+                  <div class="modal-content">
+                    <h2>Editar Tarefa</h2>
+                    <p>
+                      Nome atual: <strong>{{ editName }}</strong>
+                    </p>
+
+                    <input
+                      v-model="novoNome"
+                      type="text"
+                      placeholder="Novo nome da tarefa"
+                      @keyup.enter="manipular('salvar')"
+                    />
+
+                    <div class="botoes">
+                      <button @click="editando = false" class="cancelar">Cancelar</button>
+                      <button @click="manipular('salvar')" class="salvar">Salvar Alterações</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="status">
-              <p :class="tarefa.status">
-                {{ tarefa.status }}
-              </p>
-            </div>
-            <div class="acoes">
-              <button
-                @click="toggleStatus(tarefa)"
-                class="btn-toggle"
-                :title="
-                  tarefa.status === 'pendente' ? 'Marcar como concluída' : 'Marcar como pendente'
-                "
-              >
-                {{ tarefa.status === 'pendente' ? '↻' : '✓' }}
-              </button>
-              <button @click="removerTarefa(tarefa.id)" class="btn-remover" title="Remover tarefa">
-                ✕
-              </button>
+            <div v-else class="tarefa">
+              <div class="nome">
+                <p>Tarefa Inexistente, tente criar uma tarefa</p>
+              </div>
+              <div class="status">
+                <p :class="tarefa.status">null</p>
+              </div>
             </div>
           </div>
         </div>
@@ -135,6 +225,119 @@ const adicionarTarefa = () => {
 </template>
 
 <style scoped>
+/* O container que faz o fundo (Overlay) */
+.editar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Background mais suave e menos "pesado" */
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+}
+
+/* O cartão branco centralizado */
+.modal-content {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  /* Sombra mais suave para combinar com o fundo */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-size: 1.6rem;
+}
+
+.modal-content p {
+  font-size: 0.95rem;
+  color: #7f8c8d;
+  margin-bottom: 1.5rem;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 0.9rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid #f0f2f5;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  background: #f8f9fa;
+  transition: border-color 0.2s;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #3498db;
+  background: white;
+}
+
+.modal-content .botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Botões específicos do modal */
+.modal-content button {
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.cancelar {
+  background: #f1f2f6 !important;
+  color: #57606f !important;
+}
+
+.cancelar:hover {
+  background: #dfe4ea !important;
+}
+
+.salvar {
+  background: #27ae60 !important;
+  color: white !important;
+}
+
+.salvar:hover {
+  background: #219150 !important;
+} 
+
+.procurar {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 1.2rem;
+  background-color: #34495e;
+
+  h2 {
+    color: white;
+    font-size: larger;
+    font-weight: bolder;
+  }
+
+  input {
+    padding: 0.8rem 1.2rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+}
+
 section {
   min-height: 100vh;
   display: flex;
