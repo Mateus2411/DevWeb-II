@@ -314,7 +314,7 @@ function manipular(acao, posicaoTarefa, tarefaNome) {
 
 .salvar:hover {
   background: #219150 !important;
-} 
+}
 
 .procurar {
   display: flex;
@@ -393,79 +393,6 @@ section {
 .header-tarefas p {
   margin: 0;
   text-align: center;
-}
-
-.tarefas {
-  max-height: 500px;
-  overflow-y: auto;
-}
-
-.tarefas::-webkit-scrollbar {
-  width: 8px;
-}
-
-.tarefas::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.tarefas::-webkit-scrollbar-thumb {
-  background: #bdc3c7;
-  border-radius: 4px;
-}
-
-.tarefas::-webkit-scrollbar-thumb:hover {
-  background: #95a5a6;
-}
-
-.tarefa {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 1rem;
-  padding: 1.2rem 1.5rem;
-  align-items: center;
-  border-bottom: 1px solid #e9ecef;
-  transition: background 0.2s;
-}
-
-.tarefa:hover {
-  background: #f8f9fa;
-}
-
-.tarefa:last-child {
-  border-bottom: none;
-}
-
-.nome p {
-  margin: 0;
-  text-align: left;
-  color: #2c3e50;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.status {
-  display: flex;
-  justify-content: center;
-}
-
-.status p {
-  margin: 0;
-  color: white;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-transform: capitalize;
-  min-width: 100px;
-  text-align: center;
-}
-
-.status .pendente {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-}
-
-.status .concluido {
-  background: linear-gradient(135deg, #27ae60, #229954);
 }
 
 .adicionar-tarefa {

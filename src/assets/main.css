@@ -46,3 +46,16 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+/*
+CSS
+*/
+
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --border: rgba(99, 130, 255, 0.15);
+  --accent: #4361ee;
+  --text: #1e2130;
+  --text-muted: #8a93a8;
+  --radius: 10px;
+}

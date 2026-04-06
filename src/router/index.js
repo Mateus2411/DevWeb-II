@@ -8,16 +8,29 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/views/HomeApp.vue'),
     },
-    {
-      path: '/atividade-contador',
-      name: 'NomeIdentificação',
-      component: () => import('@/views/Atividades/AtividadeContador.vue'),
-    },
-    {
-      path: '/atividade-tarefas',
-      name: 'Gerenciador De Tarefas',
-      component: () => import('@/views/Atividades/AtividadeGerenciadorTarefas.vue'),
-    },
+
+    // #region Aulas
+      {
+        path: '/aulaprops',
+        name: 'Aula Props',
+        component: () => import('@/views/Atividades/AtvFenTar.vue'),
+      },
+    // #endregion
+
+    // #region Atividades
+      {
+        path: '/atividade-contador',
+        name: 'NomeIdentificação',
+        component: () => import('@/views/Atividades/AtividadeContador.vue'),
+      },
+      {
+        path: '/atividade-tarefas',
+        name: 'Gerenciador De Tarefas',
+        component: () => import('@/views/Atividades/AtividadeGerenciadorTarefas.vue'),
+      },
+
+    // #endregion
+
   ],
 })
 
