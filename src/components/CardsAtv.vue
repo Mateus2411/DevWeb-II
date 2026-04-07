@@ -5,63 +5,12 @@ let props = defineProps({
   state: Boolean,
 })
 
-let newTask = ref('')
-function manipular(acao, posicaoTarefa, tarefaNome) {
-  switch (acao) {
-    case 'adicionar': {
-      if (!tasks.value.some((item) => item.nome === newTask.value)) {
-        tasks.value.push({
-          id: Math.max(...tasks.value.map((item) => item.id)) + 1,
-          nome: newTask.value,
-          status: 'pendente',
-        })
-        newTask.value = ''
-      } else {
-        erro.value = true
-        setTimeout(() => {
-          erro.value = false
-        }, 1500)
-        newTask.value = ''
-      }
-      break
-    }
-    case 'deletar': {
-      tasks.value.splice(
-        tasks.value.findIndex((item) => item.id === posicaoTarefa),
-        1,
-      )
-      break
-    }
-    case 'marcar': {
-      // Melhorar isso (obs: me sinto um macaco)
-      if (
-        tasks.value[tasks.value.findIndex((item) => item.id === posicaoTarefa)].status ===
-        'pendente'
-      )
-        tasks.value[tasks.value.findIndex((item) => item.id === posicaoTarefa)].status =
-          'concluido'
-      else
-        tasks.value[tasks.value.findIndex((item) => item.id === posicaoTarefa)].status =
-          'pendente'
-      break
-    }
-    case 'editar': {
-      tasks.value[tasks.value.findIndex((item) => item.id === posicaoTarefa)].nome = tarefaNome
-      break
-    }
-    case 'salvar': {
-      const index = tasks.value.findIndex((item) => item.id === editId.value)
-      if (index !== -1 && novoNome.value.trim()) {
-        tasks.value[index].nome = novoNome.value.trim()
-      }
+let emit = defineEmits(['acao'])
 
-      editando.value = false
-      editId.value = null
-      novoNome.value = ''
-      break
-    }
-  }
+function handleActions(type){
+  emit('acao', {type, id: props.id, name: props.name})
 }
+
 </script>
 
 <template>
@@ -75,9 +24,9 @@ function manipular(acao, posicaoTarefa, tarefaNome) {
       </p>
     </div>
     <div class="actions">
-      <button class="action-btn" @click="manipular()" title="complete">✔️</button>
-      <button class="action-btn" @click="manipular()" title="delete">🗑️</button>
-      <button class="action-btn" @click="manipular()" title="update">✏️</button>
+      <button class="action-btn" @click="handleActions('complete')" title="complete">✔️</button>
+      <button class="action-btn" @click="handleActions('delete')" title="delete">🗑️</button>
+      <button class="action-btn" @click="handleActions('update')" title="update">✏️</button>
     </div>
   </div>
 </template>

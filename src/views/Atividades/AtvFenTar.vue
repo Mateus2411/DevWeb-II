@@ -25,6 +25,65 @@ const tasks = ref([
   { id: 20, name: 'Publicar versão 1.0', state: false },
 ])
 
+let newTask = ref('')
+let newName = ref('')
+let editId = ref(null)
+let editing = ref(false)
+let err = ref(false)
+
+function manipular(action, taskPosition, taskName) {
+  switch (action) {
+    case 'adicionar': {
+      if (!tasks.value.some((item) => item.nome === newTask.value)) {
+        tasks.value.push({
+          id: Math.max(...tasks.value.map((item) => item.id)) + 1,
+          nome: newTask.value,
+          status: 'pendente',
+        })
+        newTask.value = ''
+      } else {
+        err.value = true
+        setTimeout(() => {
+          err.value = false
+        }, 1500)
+        newTask.value = ''
+      }
+      break
+    }
+    case 'deletar': {
+      tasks.value.splice(
+        tasks.value.findIndex((item) => item.id === taskPosition),
+        1,
+      )
+      break
+    }
+    case 'marcar': {
+      // Melhorar isso (obs: me sinto um macaco)
+      if (
+        tasks.value[tasks.value.findIndex((item) => item.id === taskPosition)].status === 'pendente'
+      )
+        tasks.value[tasks.value.findIndex((item) => item.id === taskPosition)].status = 'concluido'
+      else
+        tasks.value[tasks.value.findIndex((item) => item.id === taskPosition)].status = 'pendente'
+      break
+    }
+    case 'editar': {
+      tasks.value[tasks.value.findIndex((item) => item.id === taskPosition)].nome = taskName
+      break
+    }
+    case 'salvar': {
+      const index = tasks.value.findIndex((item) => item.id === editId.value)
+      if (index !== -1 && newName.value.trim()) {
+        tasks.value[index].nome = newName.value.trim()
+      }
+
+      editing.value = false
+      editId.value = null
+      newName.value = ''
+      break
+    }
+  }
+}
 const search = ref('')
 const filteredTasks = computed(() => {
   if (!search.value) return tasks.value
@@ -32,30 +91,40 @@ const filteredTasks = computed(() => {
     return item.name.toLowerCase().includes(search.value.toLowerCase().trim())
   })
 })
-
-
 </script>
 
 <template>
-  <div class="container-tasks">
-    <div class="table-header">
-      <div class="search-wrapper">
-        <input v-model="search" type="text" placeholder="Buscar tarefa..." class="search-input" />
-      </div>
-      <div class="column-labels">
-        <p>Name</p>
-        <p>State</p>
-        <p>Actions</p>
-      </div>
+  <div class="title">
+    <h1>
+      Gerenciador De Tarefas
+    </h1>
+  </div>
+  <div class="container">
+    <div class="newTask">
+      <input type="text" v-model="newTask">
+      <button @click="manipular()"></button>
     </div>
+    <div class="container-tasks">
+      <div class="table-header">
+        <div class="search-wrapper">
+          <input v-model="search" type="text" placeholder="Buscar tarefa..." class="search-input" />
+        </div>
+        <div class="column-labels">
+          <p>Name</p>
+          <p>State</p>
+          <p>Actions</p>
+        </div>
+      </div>
 
-    <CardsAtv
-      v-for="item in filteredTasks"
-      :key="item.id"
-      :id="item.id"
-      :name="item.name"
-      :state="item.state"
-    />
+      <CardsAtv
+        v-for="item in filteredTasks"
+        :key="item.id"
+        :id="item.id"
+        :name="item.name"
+        :state="item.state"
+        @acao="(payload) => manipular(payload.type, payload.id, payload.name)"
+      />
+    </div>
   </div>
 </template>
 
