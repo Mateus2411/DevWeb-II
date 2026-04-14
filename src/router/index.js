@@ -16,7 +16,7 @@ const router = createRouter({
     {
       path: '/atividade-tarefas',
       name: 'Gerenciador De Tarefas',
-      component: () => import('@/views/Atividades/AtividadeGerenciadorTarefas.vue'),
+      component: () => import('@/views/Atividades/AtvFenTar.vue'),
     },
   ],
 })

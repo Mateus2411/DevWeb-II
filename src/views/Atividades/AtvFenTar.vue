@@ -1,5 +1,7 @@
 <script setup>
 import CardsAtv from '@/components/CardsAtv.vue'
+import FormTarefa from '@/components/FormTarefa.vue'
+import SearchTarefa from '@/components/SearchTarefa.vue'
 import { computed, ref } from 'vue'
 
 const tasks = ref([
@@ -25,94 +27,70 @@ const tasks = ref([
   { id: 20, name: 'Publicar versão 1.0', state: false },
 ])
 
-let newTask = ref('')
-let newName = ref('')
-let editId = ref(null)
-let editing = ref(false)
-let err = ref(false)
-
-function manipular(action, taskPosition, taskName) {
-  switch (action) {
-    case 'adicionar': {
-      if (!tasks.value.some((item) => item.nome === newTask.value)) {
-        tasks.value.push({
-          id: Math.max(...tasks.value.map((item) => item.id)) + 1,
-          nome: newTask.value,
-          status: 'pendente',
-        })
-        newTask.value = ''
-      } else {
-        err.value = true
-        setTimeout(() => {
-          err.value = false
-        }, 1500)
-        newTask.value = ''
-      }
-      break
-    }
-    case 'deletar': {
-      tasks.value.splice(
-        tasks.value.findIndex((item) => item.id === taskPosition),
-        1,
-      )
-      break
-    }
-    case 'marcar': {
-      // Melhorar isso (obs: me sinto um macaco)
-      if (
-        tasks.value[tasks.value.findIndex((item) => item.id === taskPosition)].status === 'pendente'
-      )
-        tasks.value[tasks.value.findIndex((item) => item.id === taskPosition)].status = 'concluido'
-      else
-        tasks.value[tasks.value.findIndex((item) => item.id === taskPosition)].status = 'pendente'
-      break
-    }
-    case 'editar': {
-      tasks.value[tasks.value.findIndex((item) => item.id === taskPosition)].nome = taskName
-      break
-    }
-    case 'salvar': {
-      const index = tasks.value.findIndex((item) => item.id === editId.value)
-      if (index !== -1 && newName.value.trim()) {
-        tasks.value[index].nome = newName.value.trim()
-      }
-
-      editing.value = false
-      editId.value = null
-      newName.value = ''
-      break
-    }
-  }
-}
 const search = ref('')
+const err = ref(false)
+
 const filteredTasks = computed(() => {
   if (!search.value) return tasks.value
   return tasks.value.filter((item) => {
     return item.name.toLowerCase().includes(search.value.toLowerCase().trim())
   })
 })
+
+function handleAddTask(taskName) {
+  if (!tasks.value.some((item) => item.name === taskName)) {
+    tasks.value.push({
+      id: Math.max(...tasks.value.map((item) => item.id), 0) + 1,
+      name: taskName,
+      state: false,
+    })
+  } else {
+    err.value = true
+    setTimeout(() => {
+      err.value = false
+    }, 1500)
+  }
+}
+
+function handleCompleteTask(taskId) {
+  const task = tasks.value.find((item) => item.id === taskId)
+  if (task) {
+    task.state = !task.state
+  }
+}
+
+function handleDeleteTask(taskId) {
+  const index = tasks.value.findIndex((item) => item.id === taskId)
+  if (index !== -1) {
+    tasks.value.splice(index, 1)
+  }
+}
+
+function handleSaveTask({ id, name }) {
+  const task = tasks.value.find((item) => item.id === id)
+  if (task) {
+    task.name = name
+  }
+}
+
+function handleSearch(searchTerm) {
+  search.value = searchTerm
+}
 </script>
 
 <template>
   <div class="title">
-    <h1>
-      Gerenciador De Tarefas
-    </h1>
+    <h1>Gerenciador De Tarefas</h1>
   </div>
   <div class="container">
-    <div class="newTask">
-      <input type="text" v-model="newTask">
-      <button @click="manipular()"></button>
-    </div>
+    <FormTarefa :error="err" @adicionar="handleAddTask" />
     <div class="container-tasks">
       <div class="table-header">
-        <div class="search-wrapper">
-          <input v-model="search" type="text" placeholder="Buscar tarefa..." class="search-input" />
-        </div>
+        <SearchTarefa @buscar="handleSearch" />
         <div class="column-labels">
-          <p>Name</p>
-          <p>State</p>
-          <p>Actions</p>
+          <p>Nome</p>
+          <p>Estado</p>
+          <p>Ações</p>
         </div>
       </div>
 
@@ -122,7 +100,9 @@ const filteredTasks = computed(() => {
         :id="item.id"
         :name="item.name"
         :state="item.state"
-        @acao="(payload) => manipular(payload.type, payload.id, payload.name)"
+        @complete="handleCompleteTask"
+        @delete="handleDeleteTask"
+        @save="handleSaveTask"
       />
     </div>
   </div>
@@ -131,81 +111,53 @@ const filteredTasks = computed(() => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
-:root {
-  --bg: #0f1117;
-  --surface: #161b27;
-  --border: rgba(99, 130, 255, 0.12);
-  --accent: #6382ff;
-  --text: #e2e8f0;
-  --text-muted: #64748b;
-  --radius: 10px;
+.title {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+}
+
+.title h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
 }
 
 .container-tasks {
-  font-family: 'IBM Plex Sans', sans-serif;
-  background: var(--bg);
-  min-height: 100vh;
-  padding: 2rem;
-  border-radius: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-/* ── Header wrapper ─────────────────────────────── */
 .table-header {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  margin-bottom: 0.5rem;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
-/* ── Search input ───────────────────────────────── */
-.search-wrapper {
-  display: flex;
-  width: 90%;
-}
-
-.search-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: none;
-  box-shadow: 5px 5px 20px 0px rgba(0, 0, 0, 0.053);
-  width: 100%;
-  border-radius: 6px;
-  padding: 1rem 1rem;
-  font-size: 1rem;
-  font-family: inherit;
-  color: var(--text);
-  outline: none;
-  transition: border-color 200ms ease;
-}
-
-.search-input::placeholder {
-  color: var(--text-muted);
-}
-
-.search-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(99, 130, 255, 0.12);
-}
-
-/* ── Column labels ──────────────────────────────── */
 .column-labels {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  & {
-    text-align: center;
-  }
+  text-align: center;
 }
 
 .column-labels p {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: #7f8c8d;
 }
 </style>
