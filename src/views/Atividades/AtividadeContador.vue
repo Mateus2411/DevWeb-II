@@ -40,6 +40,7 @@ function manipular(acao) {
       <button :disabled="contador <= 0" id="diminuir" @click="manipular('diminuir')">
         Diminuir contador
       </button>
+      p
     </div>
     <div id="incrementar">
       <label>Incremento:</label>

@@ -1,6 +1,13 @@
 <script setup>
-import HeaderComp from '@/components/HeaderComp.vue'
-import FooterComp from '@/components/FooterComp.vue'
+import HeaderComp from '@/components/global/HeaderComp.vue'
+import FooterComp from '@/components/global/FooterComp.vue'
+import { useLocationStore } from '@/stores/tipoP'
+import { onMounted } from 'vue'
+
+const locationStore = useLocationStore()
+onMounted(() => {
+  locationStore.getLocation()
+})
 </script>
 
 <template>

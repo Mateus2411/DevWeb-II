@@ -1,4 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import HomeApp from '@/views/HomeApp.vue'
+import AtividadeContador from '@/views/Atividades/AtividadeContador.vue'
+import AtvFenTar from '@/views/Atividades/AtvFenTar.vue'
+import AtvProdutos from '@/views/Atividades/AtvProdutos.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -6,17 +10,34 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/HomeApp.vue'),
+      component: HomeApp,
     },
     {
       path: '/atividade-contador',
       name: 'NomeIdentificação',
-      component: () => import('@/views/Atividades/AtividadeContador.vue'),
+      component: AtividadeContador,
     },
     {
       path: '/atividade-tarefas',
       name: 'Gerenciador De Tarefas',
-      component: () => import('@/views/Atividades/AtvFenTar.vue'),
+      component: AtvFenTar,
+    },
+    {
+      path: '/atv-produtos',
+      name: 'produtos',
+      component: AtvProdutos,
+      children: [
+        {
+        path: 'alimentos',
+        name: 'alimentos',
+        component: () => import('@/views/NomeArquivo'),
+        meta: {
+        // hideHeader: true,
+        // hideFooter: true,
+        // requiresAuth: true,
+        },
+        },
+      ]
     },
   ],
 })

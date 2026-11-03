@@ -15,7 +15,14 @@ const atividades = [
     titulo: 'Gerenciador de Tarefas',
     foto: '/ImagensAtividades/gen-tarefas.png',
     rota: '/atividade-tarefas'
-  }
+  },
+  {
+    id: 3,
+    titulo: 'Atividade Produtos',
+    foto: '',
+    rota: '/atv-produtos'
+  },
+
 ]
 
 const navegarPara = (rota) => {

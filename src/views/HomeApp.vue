@@ -1,5 +1,5 @@
 <script setup>
-import CardsAtividades from '@/components/CardsAtividades.vue'
+import CardsAtividades from '@/components/global/CardsAtividades.vue'
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup>
-import CardsAtv from '@/components/CardsAtv.vue'
-import FormTarefa from '@/components/FormTarefa.vue'
-import SearchTarefa from '@/components/SearchTarefa.vue'
+import CardsAtv from '@/components/activities/CardsAtv.vue'
+import FormTarefa from '@/components/activities/FormTarefa.vue'
+import SearchTarefa from '@/components/activities/SearchTarefa.vue'
 import { computed, ref } from 'vue'
 
 const tasks = ref([
